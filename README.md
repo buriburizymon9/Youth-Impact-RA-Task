@@ -4,8 +4,6 @@ R&I Research Associate Hiring
 Data cleaning and analysis deliverable 
 
 
-Instructions: Please complete the tasks below in STATA or R and submit your code with your slide deck to Sophie Ochmann (sochmann@youth-impact.org) by 10 September 2026, midnight CET. We expect this to take roughly 4 hours in total. 
-
 Context: Youth Impact's mEducation program delivers phone-based tutoring to primary school students in the Philippines. Teachers should first run a sensitization call (baseline assessment), then deliver 6 weekly tutoring calls, then an endline call (final assessment). Each phone call attempt is supposed to be logged as one SurveyCTO submission. 
 Materials provided: SurveyCTO form definitions for all phases and de-identified raw datasets of survey submissions for sensitization, implementation, and endline.
 
