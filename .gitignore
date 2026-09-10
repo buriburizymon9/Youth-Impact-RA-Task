@@ -2,3 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# Optional private location for the raw SurveyCTO exports
+data/raw/
+
+# Generated analysis outputs (recreated by the R script)
+outputs/
