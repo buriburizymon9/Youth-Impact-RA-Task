@@ -1,30 +1,57 @@
-# Youth-Impact-RA-Task
-Hiring task for Youth Impact RA Role
-R&I Research Associate Hiring
-Data cleaning and analysis deliverable 
+# Youth Impact Research Associate task
 
+This repository contains a reproducible R workflow and a seven-slide findings deck for Youth Impact's mEducation hiring exercise. The analysis cleans three SurveyCTO call-attempt exports, reduces repeated submissions using documented rules, and creates one analytic row per student across sensitization, six implementation weeks, and endline.
 
-Instructions: Please complete the tasks below in STATA or R and submit your code with your slide deck to Sophie Ochmann (sochmann@youth-impact.org) by 10 September 2026, midnight CET. We expect this to take roughly 4 hours in total. 
+## Deliverables
 
-Context: Youth Impact's mEducation program delivers phone-based tutoring to primary school students in the Philippines. Teachers should first run a sensitization call (baseline assessment), then deliver 6 weekly tutoring calls, then an endline call (final assessment). Each phone call attempt is supposed to be logged as one SurveyCTO submission. 
-Materials provided: SurveyCTO form definitions for all phases and de-identified raw datasets of survey submissions for sensitization, implementation, and endline.
+- [`RA Data Analysis Task.R`](RA%20Data%20Analysis%20Task.R): cleaning, merging, quality checks, KPI construction, aggregate tables, and figures.
+- [`deliverables/Youth_Impact_RA_Task_Rachit_Haritwal.pptx`](deliverables/Youth_Impact_RA_Task_Rachit_Haritwal.pptx): seven-slide findings and process deck.
+- [`AI_USE.md`](AI_USE.md): disclosure of how AI was used. The shareable conversation link should accompany the submission separately.
 
+## Run the analysis
 
-Task A: Clean and merge the data
-Produce a single dataset with one row per student, containing their sensitization result, their result for each implementation week, and their endline result. Each raw dataset may contain multiple submissions per student — you'll need to decide how to reduce these to one record per student per phase, and be ready to explain your reasoning (see Task C). 
-⇒ Deliverable: STATA Do-File(s) or R Scripts
+Use R 4.2 or newer. From the repository root:
 
+```r
+install.packages(c(
+  "haven", "dplyr", "tidyr", "ggplot2", "readr",
+  "stringr", "scales", "purrr", "tibble"
+))
+source("RA Data Analysis Task.R")
+```
 
-Task B: KPI graphs
-Use your cleaned dataset to produce a small number of graphs on students' learning outcomes and the program's implementation fidelity (e.g. change in numeracy level, number of tutoring calls completed). We want you to show our three KPIs (% students mastering division, % students not mastering any operation, % students learning a new operation from base- to endline) as well as any other learning or implementation fidelity graph you find important.
-⇒ Deliverable: STATA Do-File(s) or R Scripts
+The script accepts the three `.dta` inputs in either the repository root or `data/raw/`:
 
+- `01_sensitization_data.dta`
+- `02_implementation_data.dta`
+- `03_endline_data.dta`
 
-Task C: Slide deck
-Prepare a short slide deck (~6–8 slides) with two parts: 
-(1) Findings — your key KPI graphs and 2–3 takeaways on what the data tell us about the program, including any issues you notice with the program or the data; 
-(2) Process — briefly walk through how you cleaned and merged the data, the judgment calls you made (e.g. handling duplicate submissions or missing call attempts), and any data quality issues you ran into and how you resolved them. Include suggested changes to our data collection system that would reduce / avoid the occurrence of these data quality issues.
-⇒ Deliverable: Slide deck
+It writes the one-row-per-student dataset to `outputs/data/`, aggregate quality and KPI tables to `outputs/tables/`, and five figures to `outputs/figures/`. Generated row-level outputs are gitignored.
 
+## Analytic decisions
 
-On AI tools: You're welcome to use AI tools at any stage but please share your AI conversation with us. We're evaluating your judgment and understanding of the data, not just whether the code runs, so please be prepared to walk us through any part of your approach in a follow-up conversation.
+The stable cross-phase key is `hhid`. A SurveyCTO `key` identifies a submission, not a student.
+
+- **Sensitization and endline:** select the earliest valid assessment for each student. This preserves the timing of baseline/endline and avoids choosing on the observed score. If no valid assessment exists, retain the latest call attempt so its operational status is not lost.
+- **Implementation:** within each student-week, select the earliest successful tutoring submission. If no attempt succeeded, retain the latest attempt. Keep submission counts and conflict flags in either case.
+- **Missing weeks:** distinguish no logged attempt (`attempted = 0`) from an attempted but unsuccessful call. Outcome fields remain missing when no tutoring occurred.
+- **Merge:** outer-join all observed IDs to retain implementation-only records. Cohort-specific rates use explicit eligibility flags.
+- **Learning KPIs:** use students with valid assessments at both baseline and endline (`N = 240`). "Learned a new operation" means the endline numeracy level is strictly above baseline.
+
+## Headline results
+
+Among the paired assessment sample (`N = 240`):
+
+| KPI | Numerator | Result |
+|---|---:|---:|
+| Mastering division at endline | 126 | 52.5% |
+| Not mastering any operation at endline | 17 | 7.1% |
+| Learned at least one new operation | 188 | 78.3% |
+
+In the same students, division mastery was 10.8% at baseline and 37.9% mastered no operation. Weekly tutoring completion among all 431 students with a valid baseline fell from 86.5% in week 1 to 55.5% in week 6; 238 students (55.2%) completed all six weeks.
+
+## Interpretation and limitations
+
+These are descriptive pre/post changes, not causal impact estimates: there is no comparison group. Only 240 of 431 baseline-assessed students (55.7%) have a valid endline assessment, so attrition may affect the observed learning distribution. Follow-up also varies by baseline level. Results should therefore be read as outcomes for the paired assessment sample, alongside implementation and follow-up coverage.
+
+The earliest-versus-latest valid baseline sensitivity check leaves the learned-new-operation estimate unchanged at 78.3%.
