@@ -2,6 +2,16 @@
 
 This repository contains a reproducible R workflow and a seven-slide findings deck for Youth Impact's mEducation hiring exercise. The analysis cleans three SurveyCTO call-attempt exports, reduces repeated submissions using documented rules, and creates one analytic row per student across sensitization, six implementation weeks, and endline.
 
+## Exercise brief
+
+Youth Impact's mEducation program delivers phone-based tutoring to primary-school students in the Philippines. Teachers first conduct a sensitization call with a baseline assessment, then six weekly tutoring calls, and finally an endline assessment. Each call attempt is logged as a separate SurveyCTO submission.
+
+The supplied materials include SurveyCTO form definitions and de-identified exports for all three phases. The requested work is to:
+
+- clean repeated submissions and merge one row per student across all phases;
+- produce the three required learning KPIs plus useful outcome and implementation-fidelity graphs; and
+- present findings, judgment calls, data issues, and data-system recommendations in a six-to-eight-slide deck.
+
 ## Deliverables
 
 - [`RA Data Analysis Task.R`](RA%20Data%20Analysis%20Task.R): cleaning, merging, quality checks, KPI construction, aggregate tables, and figures.
